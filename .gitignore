@@ -4,3 +4,6 @@
 # System files
 .DS_Store
 Thumbs.db
+
+# Media files
+/music
