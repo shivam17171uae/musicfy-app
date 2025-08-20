@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Music Cloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app-container">
+        <div class="mobile-header">
+            <button id="hamburger-btn" class="hamburger-btn">☰</button>
+            <div id="mobile-view-switcher" class="view-switcher"></div>
+        </div>
+        <div class="app-layout">
+            <nav id="sidebar" class="sidebar">
+                <h2>My Music</h2>
+                <ul class="nav-links">
+                    <li id="nav-library" class="active">Library</li>
+                    <li id="nav-upload">Upload</li>
+                </ul>
+                <div class="playlists-section">
+                    <h3>Playlists</h3>
+                    <ul id="playlist-list"></ul>
+                    <div class="create-playlist-wrapper">
+                        <input type="text" id="new-playlist-name" placeholder="New Playlist...">
+                        <button id="create-playlist-btn">+</button>
+                    </div>
+                </div>
+            </nav>
+            <main class="main-content">
+                <div class="main-header">
+                    <h1 id="view-title">Library</h1>
+                    <div id="desktop-view-switcher" class="view-switcher"></div>
+                </div>
+                <div id="library-view" class="view active">
+                    <div id="song-grid" class="song-grid"></div>
+                    <div id="song-list" class="song-list"></div>
+                </div>
+                <div id="upload-view" class="view">
+                     <div class="upload-container">
+                        <h3>Upload Music</h3>
+                        <form id="upload-form">
+                            <label for="file-input" class="file-drop-area"><span class="file-msg">Drag & Drop or click</span></label>
+                            <input id="file-input" class="file-input" type="file" name="musicFiles" accept="audio/*" multiple>
+                            <div id="upload-preview-wrapper"><h4>Queue</h4><ul id="upload-preview"></ul></div>
+                            <button type="submit">Upload Files</button>
+                            <p id="upload-status"></p>
+                        </form>
+                    </div>
+                </div>
+            </main>
+            <footer id="now-playing-bar" class="now-playing-bar">
+                <div class="track-info clickable">
+                    <img id="current-track-cover" src="/covers/default.svg" alt="cover">
+                    <div class="track-details">
+                        <span id="current-track-title">No song playing</span>
+                        <span id="current-track-artist"></span>
+                    </div>
+                </div>
+                <div id="desktop-player-controls" class="player-controls"></div>
+                <div class="player-actions">
+                    <button id="like-btn-player" class="like-btn"></button>
+                    <button id="mobile-play-pause-btn" class="main-control play-btn"></button>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    <div id="full-screen-player" class="full-screen-player">
+        <div class="fs-content">
+            <img id="fs-cover-art" src="/covers/default.svg">
+            <div class="fs-track-details">
+                <h2 id="fs-title"></h2>
+                <p id="fs-artist"></p>
+            </div>
+            <div id="fs-player-controls" class="player-controls"></div>
+        </div>
+    </div>
+    <div id="context-menu"></div>
+    <div id="toast-container"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

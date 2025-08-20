@@ -1,0 +1,8 @@
+{
+  "name": "my-music-app-v7.1.0",
+  "version": "7.1.0",
+  "description": "A refined music streaming application with final UI polishing.",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.18.2", "multer": "^1.4.5-lts.1", "music-metadata": "^7.13.0" }
+}

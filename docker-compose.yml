@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  my-music-app-v7-1-0:
+    build: ./app
+    container_name: my-music-streamer-v7.1.0
+    ports:
+      - "4029:3000"
+    volumes:
+      - ./music:/app/music
+      - ./app/playlists.json:/app/playlists.json
+      - ./app/public/covers:/app/public/covers
+    restart: unless-stopped
