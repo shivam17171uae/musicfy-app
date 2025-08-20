@@ -1,5 +1,8 @@
 # My Music Cloud (musicfy-app)
 
+
+![App Preview](./assets/app-preview.png)
+
 A self-hosted music streaming application built with Node.js, Express, and Docker. This application allows you to upload and stream your personal music collection from any device with a web browser.
 
 ## Features
