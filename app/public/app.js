@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioPlayer = document.createElement('audio');
     audioPlayer.id = 'audio-player';
     document.body.appendChild(audioPlayer);
+    // New Search Element
+    const searchInput = $('#search-input');
     const nowPlayingBar = $('#now-playing-bar');
     const sidebar = $('#sidebar');
     const sidebarOverlay = $('#sidebar-overlay');
@@ -35,7 +37,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderMainView = () => {
         songGrid.innerHTML = ''; songList.innerHTML = ''; viewTitle.textContent = currentView.name;
         let songsToRender = currentView.type === 'library' ? [...library].sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded)) : library.filter(s => playlists[currentView.name]?.includes(s.filename));
-        if (songsToRender.length === 0) { songGrid.innerHTML = `<p>${currentView.name} is empty.</p>`; songList.innerHTML = `<p>${currentView.name} is empty.</p>`; return; }
+        
+        // --- NEW: SEARCH FILTER LOGIC ---
+        const searchQuery = searchInput.value.toLowerCase().trim();
+        if (searchQuery) {
+            songsToRender = songsToRender.filter(song =>
+                song.title.toLowerCase().includes(searchQuery) ||
+                song.artist.toLowerCase().includes(searchQuery) ||
+                song.album.toLowerCase().includes(searchQuery)
+            );
+        }
+
+        if (songsToRender.length === 0) {
+            const message = searchQuery 
+                ? `No results found for "${searchInput.value}"` 
+                : `${currentView.name} is empty.`;
+            songGrid.innerHTML = `<p>${message}</p>`;
+            songList.innerHTML = `<p>${message}</p>`;
+            return;
+        }
+        
         if (currentLayout === 'grid') {
             songGrid.style.display = 'grid'; songList.style.display = 'none';
             songsToRender.forEach(song => {
@@ -57,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePlayingUI();
     };
     const updatePlayingUI = () => { const currentSong = playbackState.queue[playbackState.currentIndex]; if (!currentSong) return; $$('.song-card, .song-row').forEach(el => { el.classList.toggle('playing', el.dataset.filename === currentSong.filename); }); };
-    const renderPlaylists = () => { playlistList.innerHTML = ''; const sortedPlaylists = Object.keys(playlists).sort((a, b) => a === "Liked Songs" ? -1 : b === "Liked Songs" ? 1 : a.localeCompare(b)); sortedPlaylists.forEach(name => { const li = document.createElement('li'); li.textContent = name; li.dataset.playlistName = name; li.addEventListener('click', () => { currentView = { type: 'playlist', name }; switchView('library-view'); hideSidebar(); }); li.addEventListener('dragover', (e) => e.preventDefault()); li.addEventListener('dragenter', () => li.classList.add('drop-target')); li.addEventListener('dragleave', () => li.classList.remove('drop-target')); li.addEventListener('drop', handleDropOnPlaylist); playlistList.appendChild(li); }); };
+    const renderPlaylists = () => { playlistList.innerHTML = ''; const sortedPlaylists = Object.keys(playlists).sort((a, b) => a === "Liked Songs" ? -1 : b === "Liked Songs" ? 1 : a.localeCompare(b)); sortedPlaylists.forEach(name => { const li = document.createElement('li'); li.textContent = name; li.dataset.playlistName = name; li.addEventListener('click', () => { searchInput.value = ''; currentView = { type: 'playlist', name }; switchView('library-view'); hideSidebar(); }); li.addEventListener('dragover', (e) => e.preventDefault()); li.addEventListener('dragenter', () => li.classList.add('drop-target')); li.addEventListener('dragleave', () => li.classList.remove('drop-target')); li.addEventListener('drop', handleDropOnPlaylist); playlistList.appendChild(li); }); };
     const updatePlayerTheme = (imageUrl) => { const defaultColor = 'transparent'; const defaultFsColor = 'var(--bg-tertiary)'; const applyColors = (barColor, fsColor) => { nowPlayingBar.style.setProperty('--dynamic-bg-color', barColor); fsPlayer.container.style.setProperty('--fs-dynamic-bg', fsColor); }; if (!imageUrl || imageUrl.endsWith('default.svg')) { applyColors(defaultColor, defaultFsColor); return; } const img = new Image(); img.crossOrigin = "Anonymous"; img.src = imageUrl; img.onload = () => { const [r, g, b] = colorThief.getColor(img); applyColors(`rgba(${r}, ${g}, ${b}, 0.3)`, `rgb(${r}, ${g}, ${b})`); }; img.onerror = () => applyColors(defaultColor, defaultFsColor); };
     const setQueueAndPlay = (songs, startSong) => { playbackState.queue = [...songs]; playbackState.currentIndex = playbackState.queue.findIndex(s => s.filename === startSong.filename); loadAndPlayCurrentSong(); };
     const loadAndPlayCurrentSong = () => { updatePlayingUI(); if (playbackState.currentIndex < 0 || playbackState.currentIndex >= playbackState.queue.length) { audioPlayer.pause(); currentTrack.title.textContent = "No song playing"; return; } const song = playbackState.queue[playbackState.currentIndex]; audioPlayer.src = `/music/${song.filename}`; audioPlayer.play(); currentTrack.title.textContent = song.title; currentTrack.artist.textContent = song.artist; currentTrack.cover.src = song.coverArtUrl; fsPlayer.cover.src = song.coverArtUrl; fsPlayer.title.textContent = song.title; fsPlayer.artist.textContent = song.artist; updatePlayerTheme(song.coverArtUrl); updateLikeButtonState(song.liked); };
@@ -82,8 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
     currentTrack.clickable.addEventListener('click', openFsPlayer); document.addEventListener('keydown', (e) => { if (e.key === "Escape" && fsPlayer.container.classList.contains('visible')) closeFsPlayer(); });
     let touchStartY = 0, touchMoveY = 0; fsPlayer.container.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; fsPlayer.container.style.transition = 'none'; }, { passive: true }); fsPlayer.container.addEventListener('touchmove', (e) => { touchMoveY = e.touches[0].clientY; const swipeDistance = touchMoveY - touchStartY; if (swipeDistance > 0) { fsPlayer.container.style.transform = `translateY(${swipeDistance}px)`; const opacity = Math.max(1 - (swipeDistance / window.innerHeight) * 1.5, 0.5); fsPlayer.container.style.opacity = opacity; } }, { passive: true }); fsPlayer.container.addEventListener('touchend', () => { const swipeDistance = touchMoveY - touchStartY; fsPlayer.container.style.transition = 'opacity .3s ease, transform .3s ease'; if (swipeDistance > 100) closeFsPlayer(); else { fsPlayer.container.style.transform = 'translateY(0)'; fsPlayer.container.style.opacity = '1'; } touchStartY = 0; touchMoveY = 0; });
     const formatTime = s => s && !isNaN(s) ? `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, '0')}` : '0:00'; const showToast = (m, t = 'success') => { const e = document.createElement('div'); e.className = `toast ${t}`, e.textContent = m, $('#toast-container').appendChild(e), setTimeout(() => e.remove(), 3e3) }; const switchView = (v) => { $$('.view').forEach(e => e.classList.remove('active')), $(`#${v}`).classList.add('active'), render() }; const updateActiveNav = () => { $$('.nav-links li, #playlist-list li').forEach(e => e.classList.remove('active')); const t = { library: '#nav-library', upload: '#nav-upload', playlist: `li[data-playlist-name="${currentView.name}"]` }[currentView.type]; $(t)?.classList.add('active') };
+    // --- NEW: EVENT LISTENER FOR SEARCH INPUT ---
+    searchInput.addEventListener('input', renderMainView);
     createPlaylistBtn.addEventListener('click', async () => { const e = newPlaylistInput.value.trim(); if (!e) return; await api.post('/api/playlists', { name: e }), newPlaylistInput.value = '', await fetchData(), renderPlaylists(), showToast(`Playlist '${e}' created`) });
-    $('#nav-library').addEventListener('click', () => { currentView = { type: 'library', name: 'Library' }, switchView('library-view'); hideSidebar() });
+    $('#nav-library').addEventListener('click', () => { searchInput.value = ''; currentView = { type: 'library', name: 'Library' }; switchView('library-view'); hideSidebar() });
     $('#nav-upload').addEventListener('click', () => { currentView = { type: 'upload', name: 'Upload Music' }, switchView('upload-view'); hideSidebar() });
     const handleUploadFiles = (e) => { const uploadPreview = $('#upload-preview'), uploadPreviewWrapper = $('#upload-preview-wrapper'); uploadPreview.innerHTML = ''; if (0 === e.length) { uploadPreviewWrapper.style.display = 'none'; return } uploadPreviewWrapper.style.display = 'block'; Array.from(e).forEach(e => { const t = document.createElement('li'); t.textContent = e.name, uploadPreview.appendChild(t) }) };
     $('#file-input').addEventListener('change', e => handleUploadFiles(e.target.files));

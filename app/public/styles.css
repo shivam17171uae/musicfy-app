@@ -7,6 +7,13 @@ html,body{margin:0;padding:0;font-family:var(--font-family);background-color:var
 .main-content{grid-area:main;background-color:var(--bg-main);overflow-y:auto;padding:30px}
 .main-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
 #view-title { flex-grow: 1; }
+/* --- NEW SEARCH BAR STYLES --- */
+.search-bar-container{margin-bottom:25px;position:relative}
+#search-input{width:100%;max-width:400px;padding:12px 12px 12px 40px;border-radius:25px;border:none;background-color:var(--bg-highlight);color:var(--text-primary);font-size:1rem;transition:background-color .2s}
+#search-input:focus{outline:none;background-color:#333}
+#search-input::placeholder{color:var(--text-secondary)}
+.search-bar-container::before{content:'';position:absolute;left:15px;top:50%;transform:translateY(-50%);width:20px;height:20px;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23b3b3b3"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>');background-repeat:no-repeat;opacity:0.7}
+/* --- END SEARCH BAR STYLES --- */
 .view-switcher{display:flex;gap:8px;}
 .view-btn{background:none;border:none;cursor:pointer;opacity:0.6;}
 .view-btn.active{opacity:1;}
@@ -121,6 +128,7 @@ html,body{margin:0;padding:0;font-family:var(--font-family);background-color:var
     .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1003;display:none}
     .sidebar-overlay.visible{display:block}
     .main-content{padding:15px}
+    #search-input { max-width: 100%; }
     .song-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:15px}
     .song-list-header{grid-template-columns:4fr 3fr; padding: 0 10px;}
     .song-list-header .header-item:first-child, .song-list-header .header-item:nth-child(4), .song-list-header .header-item:nth-child(5) {display:none;}
