@@ -448,4 +448,4 @@ SERVER_IP=$(hostname -I | awk '{print $1}')
 echo "SUCCESS! Your music app v7.2.0 is now running."
 echo "Featuring a new universal search bar!"
 echo "Access it in your browser at: http://${SERVER_IP}:${HOST_PORT}"
-echo "--------------------------------------------------------"
+echo "------------------------------------------------------"
