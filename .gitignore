@@ -7,3 +7,6 @@ Thumbs.db
 
 # Media files
 /music
+
+# User data files
+app/playlists.json
